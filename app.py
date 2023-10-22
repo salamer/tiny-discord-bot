@@ -2,6 +2,7 @@
 import os
 import logging
 import discord
+import random
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -10,29 +11,50 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-
+intents.guilds = True
+intents.reactions = True
+intents.guild_messages = True
+intents.guild_reactions = True
+intents.dm_messages = True
 
 
 
 class MyClient(discord.Client):
     async def on_ready(self):
-        print('Logged on as', self.user)
+        for guild in self.guilds:
 
-    async def on_message(self, message):
+            print(
+                f'{client.user} is connected to the following guild:\n'
+                f'{guild.name}(id: {guild.id})'
+            )
+            members = '\n - '.join([member.name for member in guild.members])
+            print(f'Guild Members:\n - {members}')
+
+    async def on_message(self, message: discord.Message):
         # don't respond to ourselves
-        if message.author == self.user:
-            return
+        brooklyn_99_quotes = [
+            'I\'m the human form of the 💯 emoji.',
+            'Bingpot!',
+            (
+                'Cool. Cool cool cool cool cool cool cool, '
+                'no doubt no doubt no doubt no doubt.'
+            ),
+        ]
+        print(message)
+        print(message.content)
+        # if message.author.id == self.user.id:
+        if message.content == 'show':
+            print(message)
+            response = random.choice(brooklyn_99_quotes)
+            await message.channel.send(response)
 
-        if message.content == 'ping':
-            await message.channel.send('pong')
+# client = discord.Client(intents=intents)
 
-client = discord.Client(intents=intents)
+# @client.event
+# async def on_ready():
 
-@client.event
-async def on_ready():
-    print(f'{client.user} has connected to Discord!')
 
-# client = MyClient(intents=intents)
+client = MyClient(intents=intents)
 
 print(TOKEN)
 client.run(TOKEN, reconnect=True)
